@@ -1,5 +1,6 @@
 <?php
 
+// validacion de texto
 $text = isset($_POST['text']) ? $_POST['text'] : '';
 
 if (!$text) {
@@ -27,26 +28,24 @@ function url_title($str, $delimiter = '-', $lowercase = true, $replace = array('
     return $str;
 }
 
+// limpiar nombre de la tecnica seo: quitarle espacios, ponerlo en mayúsculas, acortarlo si es superarior a x caracteres
+$max_chars = 23;
 $text = url_title($text, ' ', false, array());
-
 $text = trim($text);
-
 $text = strtoupper($text);
-
 $text = trim($text);
-$text = substr($text, 0, 23);
+$text = substr($text, 0, $max_chars);
 
+// generar video
 $id = $text;
-
 $id = md5($id);
-
 $path = 'mp4/' . $id . '.mp4';
 
 if (!file_exists($path)) {
     $command = "ffmpeg -i romu.mp4 -i blank.png -filter_complex \"[0:v][1:v]overlay=10:10,drawtext=enable='between(t,5,1*60)':fontfile='arial.ttf':fontcolor=yellow:text='" . $text . "':x=(w-text_w)/2:y=300:fontsize=40\" -b 250k mp4/" . $id . ".mp4";
-
     shell_exec($command);
     sleep(4);
 }
 
-header('Location: /romu_generator/?id=' . $id);
+// redirigir a la pagina con el resultado
+header('Location: index.php?id=' . $id);
